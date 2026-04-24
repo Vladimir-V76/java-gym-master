@@ -29,11 +29,14 @@ public class Timetable {
         }
     }
 
-    public List<CountOfTrainings> getCountByCoaches () {
-        if (timetable.isEmpty()) { return new ArrayList<>(); }
+    public List<CountOfTrainings> getCountByCoaches() {
+        if (timetable.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         Map<Coach, Integer> sessionsByCoach = new HashMap<>();
         for (DayOfWeek day : DayOfWeek.values()) {
-            TreeMap<TimeOfDay,TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, new TreeMap<>());
+            TreeMap<TimeOfDay, TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, new TreeMap<>());
             if (!trainingSessionByDay.isEmpty()) {
                 for (TrainingSession t : trainingSessionByDay.values()) {
                     Coach coach = t.getCoach();
