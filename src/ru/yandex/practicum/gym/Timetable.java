@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Timetable {
 
-    private Map<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable = new HashMap<>();
+    private final Map<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
         //сохраняем занятие в расписании
@@ -12,36 +12,44 @@ public class Timetable {
         newTrainingSession = timetable.getOrDefault(trainingSession.getDayOfWeek(), new TreeMap<>());
         newTrainingSession.put(trainingSession.getTimeOfDay(), trainingSession);
         timetable.put(trainingSession.getDayOfWeek(), newTrainingSession);
-        System.out.println("Тренировка " + trainingSession + " успешно внесена в расписание на "
-                + trainingSession.getDayOfWeek());
     }
 
-    //public /* непонятно, что возвращать */ getTrainingSessionsForDay(DayOfWeek dayOfWeek, Map<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable) {
     public TreeMap<TimeOfDay, TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
-        return timetable.getOrDefault(dayOfWeek, null);
+        return timetable.getOrDefault(dayOfWeek, new TreeMap<>());
     }
 
-    //public /* непонятно, что возвращать */ getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay, Map<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable) {
     public TrainingSession getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
-        return timetable.get(dayOfWeek).get(timeOfDay);
+        TreeMap<TimeOfDay, TrainingSession> sessionOnDate = timetable.getOrDefault(dayOfWeek, new TreeMap<>());
+        if (sessionOnDate.isEmpty() || !sessionOnDate.containsKey(timeOfDay)) {
+            Group group = new Group("", Age.CHILD, 0);
+            Coach coach = new Coach("", "", "");
+            return new TrainingSession(group, coach, dayOfWeek, timeOfDay);
+        } else {
+            return sessionOnDate.get(timeOfDay);
+        }
     }
 
-    public Map<Coach, Integer> getCountByCoaches () {
-        if (timetable.isEmpty()) { return null; }
-        Map<Coach, Integer> sessionByCoach = new HashMap<>();
+    public List<CountOfTrainings> getCountByCoaches () {
+        if (timetable.isEmpty()) { return new ArrayList<>(); }
+        Map<Coach, Integer> sessionsByCoach = new HashMap<>();
         for (DayOfWeek day : DayOfWeek.values()) {
-            TreeMap<TimeOfDay,TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, null);
+            TreeMap<TimeOfDay,TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, new TreeMap<>());
             if (!trainingSessionByDay.isEmpty()) {
                 for (TrainingSession t : trainingSessionByDay.values()) {
                     Coach coach = t.getCoach();
-                    int numberOfSession = sessionByCoach.getOrDefault(coach, 0);
+                    int numberOfSession = sessionsByCoach.getOrDefault(coach, 0);
                     numberOfSession++;
-                    sessionByCoach.put(coach, numberOfSession);
+                    sessionsByCoach.put(coach, numberOfSession);
                 }
             }
         }
-        return sessionByCoach;
+        List<CountOfTrainings> countOfTrainings = new ArrayList<>();
+        for (Coach coach : sessionsByCoach.keySet()) {
+            countOfTrainings.add(new CountOfTrainings(coach.getSurname(), coach.getName(),
+                    coach.getMiddleName(), sessionsByCoach.get(coach)));
+        }
+        Collections.sort(countOfTrainings);
+        Collections.reverse(countOfTrainings);
+        return countOfTrainings;
     }
 }

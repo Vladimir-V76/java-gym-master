@@ -2,11 +2,11 @@ package ru.yandex.practicum.gym;
 
 public class Group {
     //название группы
-    private String title;
+    private final String title;
     //тип (взрослая или детская)
-    private Age age;
+    final Age age;
     //длительность (в минутах)
-    private int duration;
+    final int duration;
 
     public Group(String title, Age age, int duration) {
         this.title = title;
@@ -16,13 +16,5 @@ public class Group {
 
     public String getTitle() {
         return title;
-    }
-
-    public Age getAge() {
-        return age;
-    }
-
-    public int getDuration() {
-        return duration;
     }
 }
