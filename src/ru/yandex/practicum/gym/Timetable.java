@@ -4,29 +4,39 @@ import java.util.*;
 
 public class Timetable {
 
-    private final Map<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable = new HashMap<>();
+    private final Map<DayOfWeek, ArrayList<TrainingSession>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
         //сохраняем занятие в расписании
-        TreeMap<TimeOfDay, TrainingSession> newTrainingSession;
-        newTrainingSession = timetable.getOrDefault(trainingSession.getDayOfWeek(), new TreeMap<>());
-        newTrainingSession.put(trainingSession.getTimeOfDay(), trainingSession);
+        ArrayList<TrainingSession> newTrainingSession;
+        newTrainingSession = timetable.getOrDefault(trainingSession.getDayOfWeek(), new ArrayList<>());
+        newTrainingSession.add(trainingSession);
+        Collections.sort(newTrainingSession);
         timetable.put(trainingSession.getDayOfWeek(), newTrainingSession);
     }
 
-    public TreeMap<TimeOfDay, TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        return timetable.getOrDefault(dayOfWeek, new TreeMap<>());
+    public List<TrainingSession> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+        return timetable.getOrDefault(dayOfWeek, new ArrayList<>());
     }
 
-    public TrainingSession getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        TreeMap<TimeOfDay, TrainingSession> sessionOnDate = timetable.getOrDefault(dayOfWeek, new TreeMap<>());
-        if (sessionOnDate.isEmpty() || !sessionOnDate.containsKey(timeOfDay)) {
+    public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
+        List<TrainingSession> resultList = new ArrayList<>();
+        List<TrainingSession> sessionOnDate = timetable.getOrDefault(dayOfWeek, new ArrayList<>());
+        if (!sessionOnDate.isEmpty()) {
             Group group = new Group("", Age.CHILD, 0);
             Coach coach = new Coach("", "", "");
-            return new TrainingSession(group, coach, dayOfWeek, timeOfDay);
-        } else {
-            return sessionOnDate.get(timeOfDay);
+            TrainingSession searchTraining =  new TrainingSession(group, coach, dayOfWeek, timeOfDay);
+            int itemSearchIndex = 0;
+            while (itemSearchIndex >= 0) {
+                itemSearchIndex = Collections.binarySearch(sessionOnDate, searchTraining);
+                if (itemSearchIndex >= 0) {
+                    resultList.add(sessionOnDate.get(itemSearchIndex));
+                    sessionOnDate.remove(itemSearchIndex);
+                }
+            }
+            Collections.sort(resultList);
         }
+        return resultList;
     }
 
     public List<CountOfTrainings> getCountByCoaches() {
@@ -36,9 +46,9 @@ public class Timetable {
 
         Map<Coach, Integer> sessionsByCoach = new HashMap<>();
         for (DayOfWeek day : DayOfWeek.values()) {
-            TreeMap<TimeOfDay, TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, new TreeMap<>());
+            List<TrainingSession> trainingSessionByDay = timetable.getOrDefault(day, new ArrayList<>());
             if (!trainingSessionByDay.isEmpty()) {
-                for (TrainingSession t : trainingSessionByDay.values()) {
+                for (TrainingSession t : trainingSessionByDay) {
                     Coach coach = t.getCoach();
                     int numberOfSession = sessionsByCoach.getOrDefault(coach, 0);
                     numberOfSession++;

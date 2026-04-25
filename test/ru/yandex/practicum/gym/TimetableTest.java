@@ -10,22 +10,18 @@ public class TimetableTest {
 
     @Test
     void shouldBe0IsEmptyTimetableForGetTrainingSessionsForDay() {
-        int numberSessionOfTuesday = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size();
-        Assertions.assertEquals(0, numberSessionOfTuesday);
+        int numberSession = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size();
+        Assertions.assertEquals(0, numberSession);
     }
 
     @Test
-    void shouldBeEmptyStringIsEmptyTimetableForGetTrainingSessionsForDayAndTime() {
-
-        TrainingSession trainingSessionOnMonday =
-                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0));
-        Group groupOfTrainingSessionOnMonday = trainingSessionOnMonday.getGroup();
-        String titleGroupOfTrainingSessionOnMonday = groupOfTrainingSessionOnMonday.getTitle();
-        Assertions.assertEquals("", titleGroupOfTrainingSessionOnMonday);
+    void shouldBe0IsEmptyTimetableForGetTrainingSessionsForDayAndTime() {
+        int numberSession = timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0)).size();
+        Assertions.assertEquals(0, numberSession);
     }
 
     @Test
-    void shouldBeEmptyStringIsNoTrainingAtTimeOfDayForGetTrainingSessionsForDayAndTime() {
+    void shouldBe0IsNoTrainingAtTimeOfDayForGetTrainingSessionsForDayAndTime() {
 
         Group group = new Group("Акробатика для детей", Age.CHILD, 60);
         Coach coach = new Coach("Васильев", "Николай", "Сергеевич");
@@ -33,11 +29,8 @@ public class TimetableTest {
                 DayOfWeek.MONDAY, new TimeOfDay(13, 0));
         timetable.addNewTrainingSession(trainingSession);
 
-        TrainingSession trainingSessionOnMonday =
-                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0));
-        Group groupOfTrainingSessionOnMonday = trainingSessionOnMonday.getGroup();
-        String titleGroupOfTrainingSessionOnMonday = groupOfTrainingSessionOnMonday.getTitle();
-        Assertions.assertEquals("", titleGroupOfTrainingSessionOnMonday);
+        int numberSession = timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0)).size();
+        Assertions.assertEquals(0, numberSession);
     }
 
 
@@ -88,14 +81,9 @@ public class TimetableTest {
         // Проверить, что за четверг вернулось два занятия в правильном порядке: сначала в 13:00, потом в 20:00
         int numberSessionOfThursday = timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY).size();
         Assertions.assertEquals(2, numberSessionOfThursday);
-        Map.Entry<TimeOfDay, TrainingSession> firstRecordOfMap =
-                timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY).pollFirstEntry();
-        TimeOfDay timeOfFirstSession = firstRecordOfMap.getKey();
-        Map.Entry<TimeOfDay, TrainingSession> secondRecordOfMap =
-                timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY).pollFirstEntry();
-        TimeOfDay timeOfSecondSession = secondRecordOfMap.getKey();
-        Assertions.assertEquals(new TimeOfDay(13,0),timeOfFirstSession);
-        Assertions.assertEquals(new TimeOfDay(20,0),timeOfSecondSession);
+        List<TrainingSession> trainingSessions = timetable.getTrainingSessionsForDay(DayOfWeek.THURSDAY);
+        Assertions.assertEquals(new TimeOfDay(13,0),trainingSessions.get(0).getTimeOfDay());
+        Assertions.assertEquals(new TimeOfDay(20,0),trainingSessions.get(1).getTimeOfDay());
 
         // Проверить, что за вторник не вернулось занятий
         int numberSessionOfTuesday = timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size();
@@ -113,18 +101,14 @@ public class TimetableTest {
         timetable.addNewTrainingSession(singleTrainingSession);
 
         //Проверить, что за понедельник в 13:00 вернулось одно занятие
-        TrainingSession trainingSessionOnMonday1 =
-                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(13,0));
-        Group groupOfTrainingSessionOnMonday1 = trainingSessionOnMonday1.getGroup();
-        String titleGroupOfTrainingSessionOnMonday1 = groupOfTrainingSessionOnMonday1.getTitle();
-        Assertions.assertEquals("Акробатика для детей", titleGroupOfTrainingSessionOnMonday1);
+        int numberSessionOfMondayFrom13_00 =
+                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(13,0)).size();
+        Assertions.assertEquals(1, numberSessionOfMondayFrom13_00);
 
         //Проверить, что за понедельник в 14:00 не вернулось занятий
-        TrainingSession trainingSessionOnMonday2 =
-                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0));
-        Group groupOfTrainingSessionOnMonday2 = trainingSessionOnMonday2.getGroup();
-        String titleGroupOfTrainingSessionOnMonday2 = groupOfTrainingSessionOnMonday2.getTitle();
-        Assertions.assertEquals("", titleGroupOfTrainingSessionOnMonday2);
+        int numberSessionOfMondayFrom14_00 =
+                timetable.getTrainingSessionsForDayAndTime(DayOfWeek.MONDAY, new TimeOfDay(14,0)).size();
+        Assertions.assertEquals(0, numberSessionOfMondayFrom14_00);
     }
     @Test
     void shouldBe0IsEmptyTimeTableForCountByCoaches () {
@@ -133,7 +117,7 @@ public class TimetableTest {
     }
 
     @Test
-    void shouldBe1ifSingleCoachInTimetableAnd2IsCountOfTrainingIsThisCoachForCountByCoaches () {
+    void shouldBe1IsSingleCoachInTimetableAnd2IsCountOfTrainingIsThisCoachForCountByCoaches () {
         Coach coach = new Coach("Васильев", "Николай", "Сергеевич");
 
         Group groupAdult = new Group("Акробатика для взрослых", Age.ADULT, 90);
