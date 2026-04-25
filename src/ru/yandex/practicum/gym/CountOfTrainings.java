@@ -14,6 +14,6 @@ public class CountOfTrainings extends Coach implements Comparable<CountOfTrainin
 
     @Override
     public int compareTo(CountOfTrainings o) {
-        return this.count - o.count;
+        return Integer.compare(this.count, o.count);
     }
 }
