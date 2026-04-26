@@ -1,12 +1,14 @@
 package ru.yandex.practicum.gym;
 
+import java.util.Objects;
+
 public class Group {
     //название группы
-    private String title;
+    private final String title;
     //тип (взрослая или детская)
-    private Age age;
+    final Age age;
     //длительность (в минутах)
-    private int duration;
+    final int duration;
 
     public Group(String title, Age age, int duration) {
         this.title = title;
@@ -14,15 +16,15 @@ public class Group {
         this.duration = duration;
     }
 
-    public String getTitle() {
-        return title;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return duration == group.duration && Objects.equals(title, group.title) && age == group.age;
     }
 
-    public Age getAge() {
-        return age;
-    }
-
-    public int getDuration() {
-        return duration;
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, age, duration);
     }
 }
